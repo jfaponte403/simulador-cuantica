@@ -68,7 +68,7 @@ def MTD(elementos, ejemplo):
             error = False
             break
 
-with open("ejemplo.txt", "r", encoding="utf-8") as archivo:
+with open("programa.txt", "r", encoding="utf-8") as archivo:
     elementos = []
     for linea in archivo:
         linea_limpia = linea.strip()
