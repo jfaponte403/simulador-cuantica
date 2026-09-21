@@ -33,14 +33,17 @@ def afd(elementos, estado_inicial, cinta):
 
 mensaje = {True: 'Aceptada', False: 'Rechazada'}
 
+MAX_PASOS = 10000
+
 def mtd(elementos, cinta):
     estado = '0' or 'q0'
     posicion = 0
     entrada = cinta[0]
     entrada.replace(" ", "_")
     nuevo_string = deque(entrada)
-    error = True
-    while error == True and posicion < 10:
+    pasos = 0
+    while pasos < MAX_PASOS:
+        pasos += 1
         confirmacion = False
         for i in range(len(elementos)):
             if estado == elementos[i][0]:
@@ -62,6 +65,8 @@ def mtd(elementos, cinta):
         if confirmacion == False:
             print(f"Resultado: {resultado}")
             break
+    else:
+        print(f"La maquina no se detuvo despues de {MAX_PASOS} pasos")
 
 def leer_programa(ruta_programa):
     elementos = []
