@@ -15,8 +15,8 @@ class BaseTestCase(unittest.TestCase):
         self.addCleanup(self.tmp.cleanup)
 
     def ejecutar(self, programa, cinta):
-        ruta_programa = os.path.join(self.tmp.name, "programa.txt")
-        ruta_cinta = os.path.join(self.tmp.name, "cinta.txt")
+        ruta_programa = os.path.join(self.tmp.name, "programaMTD.txt")
+        ruta_cinta = os.path.join(self.tmp.name, "cintaMTD.txt")
         with open(ruta_programa, "w", encoding="utf-8") as archivo:
             archivo.write(programa)
         with open(ruta_cinta, "w", encoding="utf-8") as archivo:

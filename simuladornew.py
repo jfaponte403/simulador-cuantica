@@ -1,3 +1,6 @@
+# MTD: python simuladornew.py programaMTD.txt cintaMTD.txt
+# AFD: python simuladornew.py programaAFD.txt cintaAFD.txt
+
 import sys
 from collections import deque
 
@@ -64,7 +67,7 @@ def MTD(elementos, cinta):
 
 #el primer argumento es el programa y el segundo es la cinta
 if len(sys.argv) != 3:
-    print("Uso: python simuladornew.py <programa.txt> <cinta.txt>")
+    print("Uso: python simuladornew.py <programaMTD.txt> <cintaMTD.txt>")
     sys.exit(1)
 
 ruta_programa = sys.argv[1]
