@@ -65,45 +65,52 @@ def MTD(elementos, cinta):
             error = False
             break
 
-#el primer argumento es el programa y el segundo es la cinta
-if len(sys.argv) != 3:
-    print("Uso: python simuladornew.py <programaMTD.txt> <cintaMTD.txt>")
-    sys.exit(1)
-
-ruta_programa = sys.argv[1]
-ruta_cinta = sys.argv[2]
-
-with open(ruta_programa, "r", encoding="utf-8") as archivo:
+def LeerPrograma(ruta_programa):
     elementos = []
-    for linea in archivo:
-        linea_limpia = linea.strip()
-        if linea_limpia:
-            palabras = linea_limpia.split()
-            elementos.append(palabras)
+    with open(ruta_programa, "r", encoding="utf-8") as archivo:
+        for linea in archivo:
+            linea_limpia = linea.strip()
+            if linea_limpia:
+                palabras = linea_limpia.split()
+                elementos.append(palabras)
+    return elementos
 
-
-with open(ruta_cinta, "r", encoding="utf-8") as archivo:
-    cinta = [linea.rstrip() for linea in archivo]
+def LeerCinta(ruta_cinta):
+    with open(ruta_cinta, "r", encoding="utf-8") as archivo:
+        cinta = [linea.rstrip() for linea in archivo]
     if not cinta:
-            cinta.append("_")
+        cinta.append("_")
+    return cinta
 
-#contamos las lineas y evaluamos la primera linea
-total_lineas = len(elementos)
-total_elementos = len(elementos[0])
-inicio = 0
-if total_elementos == 3:
-    print("\n|--- Automata Finito Determinista ---|")
-    if VerificarMultipleDefinitios(elementos, inicio):
-        print("Multiple definitions!!!")
+def main():
+    #el primer argumento es el programa y el segundo es la cinta
+    if len(sys.argv) != 3:
+        print("Uso: python simuladornew.py <programaMTD.txt> <cintaMTD.txt>")
+        sys.exit(1)
+
+    elementos = LeerPrograma(sys.argv[1])
+    cinta = LeerCinta(sys.argv[2])
+
+    #contamos los elementos de la primera linea para saber si es AFD o MTD
+    total_elementos = len(elementos[0])
+    inicio = 0
+    if total_elementos == 3:
+        print("\n|--- Automata Finito Determinista ---|")
+        if VerificarMultipleDefinitios(elementos, inicio):
+            print("Multiple definitions!!!")
+        else:
+            for entrada in cinta:
+                entrada = entrada.strip()
+                print(f"Cinta Inicial: {entrada}")
+                print(f"Resultado: {mensaje[AFD(elementos, '0', entrada)]}")
     else:
-        for entrada in cinta:
-            entrada = entrada.strip()
-            print(f"Cinta Inicial: {entrada}")
-            print(f"Resultado: {mensaje[AFD(elementos, '0', entrada)]}")
-else:
-    print("\n|--- Maquina de Turing Determinista ---|")
-    if VerificarMultipleDefinitios(elementos, inicio):
-        print("Multiple definitions!!!")
-    else:
-        print(f"Cinta Inicial: {str(cinta)}")
-        MTD(elementos, cinta)
+        print("\n|--- Maquina de Turing Determinista ---|")
+        if VerificarMultipleDefinitios(elementos, inicio):
+            print("Multiple definitions!!!")
+        else:
+            print(f"Cinta Inicial: {str(cinta)}")
+            MTD(elementos, cinta)
+
+
+if __name__ == "__main__":
+    main()
