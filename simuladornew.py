@@ -16,13 +16,13 @@ def VerificarMultipleDefinitios(elementos, inicio):
         definitios[clave] = valor
     return False
 
-def AFD(elementos, ejemplos):
-    for i in range(len(ejemplos)):
+def AFD(elementos, cintas):
+    for i in range(len(cintas)):
         estado = elementos[0][0]
-        ejemplo = ejemplos[i]
-        print("el ejemplo es " + ejemplo)
-        for j in range(len(ejemplo)):
-            caracter = ejemplo[j]
+        cinta = cintas[i]
+        print("la cinta es " + cinta)
+        for j in range(len(cinta)):
+            caracter = cinta[j]
             for k in range(2,len(elementos)):
                 if estado == elementos[k][0]:
                         if caracter == elementos[k][1]:
@@ -37,10 +37,10 @@ def AFD(elementos, ejemplos):
         if n > len(elementos[1]):
             print("FALSE!!!")
 
-def MTD(elementos, ejemplo):
+def MTD(elementos, cinta):
     estado = '0' or 'q0'
     posicion = 0
-    input = ejemplo[0]
+    input = cinta[0]
     input.replace(" ", "_")
     nuevo_string = deque(input)
     error = True
@@ -86,9 +86,9 @@ with open(ruta_programa, "r", encoding="utf-8") as archivo:
 
 
 with open(ruta_cinta, "r", encoding="utf-8") as archivo:
-    ejemplo = [linea.rstrip() for linea in archivo]
-    if not ejemplo:
-            ejemplo.append("_")
+    cinta = [linea.rstrip() for linea in archivo]
+    if not cinta:
+            cinta.append("_")
 
 #contamos las lineas y evaluamos la primera linea
 total_lineas = len(elementos)
@@ -100,11 +100,11 @@ if total_elementos == 1:
     if VerificarMultipleDefinitios(elementos, inicio):
         print("Multiple definitions!!!")
     else:
-        AFD(elementos, ejemplo)
+        AFD(elementos, cinta)
 else:
     print("\n|--- Maquina de Turing Determinista ---|")
     if VerificarMultipleDefinitios(elementos, inicio):
         print("Multiple definitions!!!")
     else:
-        print(f"Cinta Inicial: {str(ejemplo)}")
-        MTD(elementos, ejemplo)
+        print(f"Cinta Inicial: {str(cinta)}")
+        MTD(elementos, cinta)
