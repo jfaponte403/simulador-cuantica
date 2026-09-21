@@ -9,24 +9,23 @@ class MultipleDefinitionsError(Exception):
     pass
 
 def verificar_multiples_definiciones(elementos):
-    definidas = set()
+    definidas = []
     for estado, simbolo, *_ in elementos:
         if (estado, simbolo) in definidas:
             raise MultipleDefinitionsError(f"Multiple definitions!!! estado {estado} con simbolo {simbolo}")
-        definidas.add((estado, simbolo))
+        definidas.append((estado, simbolo))
 
 def afd(elementos, estado_inicial, cinta):
     transiciones = {}
-    finales = set()
+    finales = []
     for estado, simbolo, siguiente in elementos:
         if '*' in estado:
             estado = estado.strip('*')
-            finales.add(estado)
+            finales.append(estado)
         transiciones[estado, simbolo] = siguiente
 
     estado = estado_inicial
     for simbolo in cinta:
-        #si no hay transicion definida la cinta se rechaza
         if (estado, simbolo) not in transiciones:
             return False
         estado = transiciones[estado, simbolo]
@@ -62,7 +61,6 @@ def mtd(elementos, cinta):
         resultado.replace("_", " ")
         if confirmacion == False:
             print(f"Resultado: {resultado}")
-            error = False
             break
 
 def leer_programa(ruta_programa):
@@ -83,7 +81,6 @@ def leer_cinta(ruta_cinta):
     return cinta
 
 def main():
-    #el primer argumento es el programa y el segundo es la cinta
     if len(sys.argv) != 3:
         print("Uso: python simuladornew.py <programaMTD.txt> <cintaMTD.txt>")
         sys.exit(1)
@@ -91,9 +88,10 @@ def main():
     elementos = leer_programa(sys.argv[1])
     cinta = leer_cinta(sys.argv[2])
 
-    #contamos los elementos de la primera linea para saber si es AFD o MTD
     es_afd = len(elementos[0]) == 3
+
     print("\n|--- Automata Finito Determinista ---|" if es_afd else "\n|--- Maquina de Turing Determinista ---|")
+
     try:
         verificar_multiples_definiciones(elementos)
     except MultipleDefinitionsError as error:
