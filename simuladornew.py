@@ -5,15 +5,15 @@ import sys
 from collections import deque
 
 
-def VerificarMultipleDefinitios(elementos, inicio):
-    definitios = {}
-    for i in range(inicio,len(elementos)):
-        clave = elementos[i][0]
-        valor = elementos[i][1]
-        if clave in definitios and definitios[clave] == valor:
-            return True
-        definitios[clave] = valor
-    return False
+class MultipleDefinitionsError(Exception):
+    pass
+
+def VerificarMultipleDefinitios(elementos):
+    definidas = set()
+    for estado, simbolo, *_ in elementos:
+        if (estado, simbolo) in definidas:
+            raise MultipleDefinitionsError(f"Multiple definitions!!! estado {estado} con simbolo {simbolo}")
+        definidas.add((estado, simbolo))
 
 def AFD(elementos, q0, cinta):
     d = {}
@@ -92,24 +92,22 @@ def main():
     cinta = LeerCinta(sys.argv[2])
 
     #contamos los elementos de la primera linea para saber si es AFD o MTD
-    total_elementos = len(elementos[0])
-    inicio = 0
-    if total_elementos == 3:
-        print("\n|--- Automata Finito Determinista ---|")
-        if VerificarMultipleDefinitios(elementos, inicio):
-            print("Multiple definitions!!!")
-        else:
-            for entrada in cinta:
-                entrada = entrada.strip()
-                print(f"Cinta Inicial: {entrada}")
-                print(f"Resultado: {mensaje[AFD(elementos, '0', entrada)]}")
+    es_afd = len(elementos[0]) == 3
+    print("\n|--- Automata Finito Determinista ---|" if es_afd else "\n|--- Maquina de Turing Determinista ---|")
+    try:
+        VerificarMultipleDefinitios(elementos)
+    except MultipleDefinitionsError as error:
+        print(error)
+        sys.exit(1)
+
+    if es_afd:
+        for entrada in cinta:
+            entrada = entrada.strip()
+            print(f"Cinta Inicial: {entrada}")
+            print(f"Resultado: {mensaje[AFD(elementos, '0', entrada)]}")
     else:
-        print("\n|--- Maquina de Turing Determinista ---|")
-        if VerificarMultipleDefinitios(elementos, inicio):
-            print("Multiple definitions!!!")
-        else:
-            print(f"Cinta Inicial: {str(cinta)}")
-            MTD(elementos, cinta)
+        print(f"Cinta Inicial: {str(cinta)}")
+        MTD(elementos, cinta)
 
 
 if __name__ == "__main__":
