@@ -8,38 +8,38 @@ from collections import deque
 class MultipleDefinitionsError(Exception):
     pass
 
-def VerificarMultipleDefinitios(elementos):
+def verificar_multiples_definiciones(elementos):
     definidas = set()
     for estado, simbolo, *_ in elementos:
         if (estado, simbolo) in definidas:
             raise MultipleDefinitionsError(f"Multiple definitions!!! estado {estado} con simbolo {simbolo}")
         definidas.add((estado, simbolo))
 
-def AFD(elementos, q0, cinta):
-    d = {}
-    F = set()
-    for q, s, n in elementos:
-        if '*' in q:
-            q = q.strip('*')
-            F.add(q)
-        d[q, s] = n
+def afd(elementos, estado_inicial, cinta):
+    transiciones = {}
+    finales = set()
+    for estado, simbolo, siguiente in elementos:
+        if '*' in estado:
+            estado = estado.strip('*')
+            finales.add(estado)
+        transiciones[estado, simbolo] = siguiente
 
-    q = q0
+    estado = estado_inicial
     for simbolo in cinta:
         #si no hay transicion definida la cinta se rechaza
-        if (q, simbolo) not in d:
+        if (estado, simbolo) not in transiciones:
             return False
-        q = d[q, simbolo]
-    return q in F
+        estado = transiciones[estado, simbolo]
+    return estado in finales
 
 mensaje = {True: 'Aceptada', False: 'Rechazada'}
 
-def MTD(elementos, cinta):
+def mtd(elementos, cinta):
     estado = '0' or 'q0'
     posicion = 0
-    input = cinta[0]
-    input.replace(" ", "_")
-    nuevo_string = deque(input)
+    entrada = cinta[0]
+    entrada.replace(" ", "_")
+    nuevo_string = deque(entrada)
     error = True
     while error == True and posicion < 10:
         confirmacion = False
@@ -65,7 +65,7 @@ def MTD(elementos, cinta):
             error = False
             break
 
-def LeerPrograma(ruta_programa):
+def leer_programa(ruta_programa):
     elementos = []
     with open(ruta_programa, "r", encoding="utf-8") as archivo:
         for linea in archivo:
@@ -75,7 +75,7 @@ def LeerPrograma(ruta_programa):
                 elementos.append(palabras)
     return elementos
 
-def LeerCinta(ruta_cinta):
+def leer_cinta(ruta_cinta):
     with open(ruta_cinta, "r", encoding="utf-8") as archivo:
         cinta = [linea.rstrip() for linea in archivo]
     if not cinta:
@@ -88,14 +88,14 @@ def main():
         print("Uso: python simuladornew.py <programaMTD.txt> <cintaMTD.txt>")
         sys.exit(1)
 
-    elementos = LeerPrograma(sys.argv[1])
-    cinta = LeerCinta(sys.argv[2])
+    elementos = leer_programa(sys.argv[1])
+    cinta = leer_cinta(sys.argv[2])
 
     #contamos los elementos de la primera linea para saber si es AFD o MTD
     es_afd = len(elementos[0]) == 3
     print("\n|--- Automata Finito Determinista ---|" if es_afd else "\n|--- Maquina de Turing Determinista ---|")
     try:
-        VerificarMultipleDefinitios(elementos)
+        verificar_multiples_definiciones(elementos)
     except MultipleDefinitionsError as error:
         print(error)
         sys.exit(1)
@@ -104,10 +104,10 @@ def main():
         for entrada in cinta:
             entrada = entrada.strip()
             print(f"Cinta Inicial: {entrada}")
-            print(f"Resultado: {mensaje[AFD(elementos, '0', entrada)]}")
+            print(f"Resultado: {mensaje[afd(elementos, '0', entrada)]}")
     else:
         print(f"Cinta Inicial: {str(cinta)}")
-        MTD(elementos, cinta)
+        mtd(elementos, cinta)
 
 
 if __name__ == "__main__":

@@ -5,7 +5,11 @@ import tempfile
 import unittest
 
 # El simulador real, ejecutado como script: python simuladornew.py <programa> <cinta>
-SIMULADOR = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "simuladornew.py")
+RAIZ = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+SIMULADOR = os.path.join(RAIZ, "simuladornew.py")
+
+sys.path.insert(0, RAIZ)
+from simuladornew import MultipleDefinitionsError, verificar_multiples_definiciones
 
 
 class BaseTestCase(unittest.TestCase):
@@ -27,6 +31,7 @@ class BaseTestCase(unittest.TestCase):
             capture_output=True,
             text=True,
         )
+        self.salida = proceso.stdout
         # El resultado de cada cinta, sin los blancos "_" de los extremos
         resultados = []
         for linea in proceso.stdout.splitlines():
@@ -107,6 +112,46 @@ class TestSimulador(BaseTestCase):
 
         self.assertEqual(status, 0)
         self.assertEqual(resultados, expected)
+
+    def test_mtd_con_definicion_duplicada_muestra_error(self):
+        programa = (
+            "0 1 1 r 0\n"
+            "0 0 0 r 0\n"
+            "0 1 0 l 1\n"
+        )
+
+        status, resultados = self.ejecutar(programa, "1010")
+
+        self.assertEqual(status, 1)
+        self.assertEqual(resultados, [])
+        self.assertIn("Multiple definitions!!! estado 0 con simbolo 1", self.salida)
+
+    def test_afd_con_definicion_duplicada_muestra_error(self):
+        programa = (
+            "0 1 1\n"
+            "1 1 0\n"
+            "0 1 0\n"
+        )
+
+        status, resultados = self.ejecutar(programa, "11")
+
+        self.assertEqual(status, 1)
+        self.assertEqual(resultados, [])
+        self.assertIn("Multiple definitions!!! estado 0 con simbolo 1", self.salida)
+
+
+class TestVerificarMultiplesDefiniciones(unittest.TestCase):
+    def test_sin_duplicados_no_lanza_excepcion(self):
+        verificar_multiples_definiciones([["0", "1", "1"], ["0", "0", "0"], ["1", "1", "0"]])
+
+    def test_duplicado_lanza_excepcion(self):
+        with self.assertRaises(MultipleDefinitionsError):
+            verificar_multiples_definiciones([["0", "1", "1"], ["0", "1", "0"]])
+
+    def test_duplicado_no_consecutivo_lanza_excepcion(self):
+        # La version anterior solo comparaba con la ultima definicion del estado
+        with self.assertRaises(MultipleDefinitionsError):
+            verificar_multiples_definiciones([["0", "1", "1"], ["0", "0", "0"], ["0", "1", "0"]])
 
 
 if __name__ == "__main__":
