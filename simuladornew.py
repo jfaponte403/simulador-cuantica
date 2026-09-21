@@ -1,6 +1,7 @@
 # vamos a identificar el tipo de automata
 # si se ingresan cuatro elementos de inicio entonces es MTD
 # por el contrario si se ingresan tres elementos es un AFD
+import sys
 from collections import deque
 
 #hay que verificar que no se repitan las reglas Multiple definitions
@@ -67,7 +68,15 @@ def MTD(elementos, ejemplo):
             error = False
             break
 
-with open("programa.txt", "r", encoding="utf-8") as archivo:
+#el primer argumento es el programa y el segundo es la cinta
+if len(sys.argv) != 3:
+    print("Uso: python simuladornew.py <programa.txt> <cinta.txt>")
+    sys.exit(1)
+
+ruta_programa = sys.argv[1]
+ruta_cinta = sys.argv[2]
+
+with open(ruta_programa, "r", encoding="utf-8") as archivo:
     elementos = []
     for linea in archivo:
         linea_limpia = linea.strip()
@@ -76,7 +85,7 @@ with open("programa.txt", "r", encoding="utf-8") as archivo:
             elementos.append(palabras)
 
 
-with open("cinta.txt", "r", encoding="utf-8") as archivo:
+with open(ruta_cinta, "r", encoding="utf-8") as archivo:
     ejemplo = [linea.rstrip() for linea in archivo]
     if not ejemplo:
             ejemplo.append("_")
