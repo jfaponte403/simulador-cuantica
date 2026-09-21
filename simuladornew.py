@@ -1,10 +1,6 @@
-# vamos a identificar el tipo de automata
-# si se ingresan cuatro elementos de inicio entonces es MTD
-# por el contrario si se ingresan tres elementos es un AFD
 import sys
 from collections import deque
 
-#hay que verificar que no se repitan las reglas Multiple definitions
 
 def VerificarMultipleDefinitios(elementos, inicio):
     definitios = {}
@@ -16,26 +12,24 @@ def VerificarMultipleDefinitios(elementos, inicio):
         definitios[clave] = valor
     return False
 
-def AFD(elementos, cintas):
-    for i in range(len(cintas)):
-        estado = elementos[0][0]
-        cinta = cintas[i]
-        print("la cinta es " + cinta)
-        for j in range(len(cinta)):
-            caracter = cinta[j]
-            for k in range(2,len(elementos)):
-                if estado == elementos[k][0]:
-                        if caracter == elementos[k][1]:
-                            estado = elementos[k][2]
-                            break
-        n = 0
-        while n < len(elementos[1]):
-            if estado == (elementos[1][n]):
-                print(f"TRUE!!!")
-                break
-            n = n + 3
-        if n > len(elementos[1]):
-            print("FALSE!!!")
+def AFD(elementos, q0, cinta):
+    d = {}
+    F = set()
+    for q, s, n in elementos:
+        if '*' in q:
+            q = q.strip('*')
+            F.add(q)
+        d[q, s] = n
+
+    q = q0
+    for simbolo in cinta:
+        #si no hay transicion definida la cinta se rechaza
+        if (q, simbolo) not in d:
+            return False
+        q = d[q, simbolo]
+    return q in F
+
+mensaje = {True: 'Aceptada', False: 'Rechazada'}
 
 def MTD(elementos, cinta):
     estado = '0' or 'q0'
@@ -94,13 +88,15 @@ with open(ruta_cinta, "r", encoding="utf-8") as archivo:
 total_lineas = len(elementos)
 total_elementos = len(elementos[0])
 inicio = 0
-if total_elementos == 1:
-    inicio = 2
-    print("este es un AFD")
+if total_elementos == 3:
+    print("\n|--- Automata Finito Determinista ---|")
     if VerificarMultipleDefinitios(elementos, inicio):
         print("Multiple definitions!!!")
     else:
-        AFD(elementos, cinta)
+        for entrada in cinta:
+            entrada = entrada.strip()
+            print(f"Cinta Inicial: {entrada}")
+            print(f"Resultado: {mensaje[AFD(elementos, '0', entrada)]}")
 else:
     print("\n|--- Maquina de Turing Determinista ---|")
     if VerificarMultipleDefinitios(elementos, inicio):

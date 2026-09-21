@@ -27,12 +27,12 @@ class BaseTestCase(unittest.TestCase):
             capture_output=True,
             text=True,
         )
-        # El resultado de la cinta, sin los blancos "_" de los extremos
-        resultado = ""
+        # El resultado de cada cinta, sin los blancos "_" de los extremos
+        resultados = []
         for linea in proceso.stdout.splitlines():
             if linea.startswith("Resultado: "):
-                resultado = linea[len("Resultado: "):].strip("_")
-        return proceso.returncode, resultado
+                resultados.append(linea[len("Resultado: "):].strip("_"))
+        return proceso.returncode, resultados
 
 
 class TestSimulador(BaseTestCase):
@@ -51,10 +51,10 @@ class TestSimulador(BaseTestCase):
         )
         cinta = "1010"
 
-        status, resultado = self.ejecutar(programa, cinta)
+        status, resultados = self.ejecutar(programa, cinta)
 
         self.assertEqual(status, 0)
-        self.assertEqual(resultado, "1011")
+        self.assertEqual(resultados, ["1011"])
 
     def test_mtd_suma_uno_a_111(self):
         programa = (
@@ -68,10 +68,45 @@ class TestSimulador(BaseTestCase):
         )
         cinta = "111"
 
-        status, resultado = self.ejecutar(programa, cinta)
+        status, resultados = self.ejecutar(programa, cinta)
 
         self.assertEqual(status, 0)
-        self.assertEqual(resultado, "1000")
+        self.assertEqual(resultados, ["1000"])
+
+    def test_afd_acepta_cantidad_de_unos_multiplo_de_tres(self):
+        # Formato: estado simbolo siguiente; "*" marca el estado final
+        programa = (
+            "0 1 1\n"
+            "1 1 2\n"
+            "2 1 3\n"
+            "*3 1 1\n"
+        )
+        cinta = (
+            "1\n"
+            "11\n"
+            "111\n"
+            "1111\n"
+            "11111\n"
+            "111111\n"
+            "1111111\n"
+            "11111111\n"
+        )
+
+        status, resultados = self.ejecutar(programa, cinta)
+
+        expected = [
+            "Rechazada",  # 1
+            "Rechazada",  # 11
+            "Aceptada",   # 111
+            "Rechazada",  # 1111
+            "Rechazada",  # 11111
+            "Aceptada",   # 111111
+            "Rechazada",  # 1111111
+            "Rechazada",  # 11111111
+        ]
+
+        self.assertEqual(status, 0)
+        self.assertEqual(resultados, expected)
 
 
 if __name__ == "__main__":
