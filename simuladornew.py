@@ -29,16 +29,15 @@ def AFD(elementos, ejemplos):
                             break
         n = 0
         while n < len(elementos[1]):
-            if estado == (elementos[1][n]): 
+            if estado == (elementos[1][n]):
                 print(f"TRUE!!!")
                 break
-            n = n + 3 
+            n = n + 3
         if n > len(elementos[1]):
             print("FALSE!!!")
 
 def MTD(elementos, ejemplo):
-    confirmacion = False
-    estado = 'q0'
+    estado = '0' or 'q0'
     posicion = 0
     input = ejemplo[0]
     input.replace(" ", "_")
@@ -63,8 +62,8 @@ def MTD(elementos, ejemplo):
                     confirmacion = True
         resultado = "".join(nuevo_string)
         resultado.replace("_", " ")
-        print(resultado)
         if confirmacion == False:
+            print(f"Resultado: {resultado}")
             error = False
             break
 
@@ -80,7 +79,7 @@ with open("programa.txt", "r", encoding="utf-8") as archivo:
 with open("cinta.txt", "r", encoding="utf-8") as archivo:
     ejemplo = [linea.rstrip() for linea in archivo]
     if not ejemplo:
-            ejemplo.append("_")  
+            ejemplo.append("_")
 
 #contamos las lineas y evaluamos la primera linea
 total_lineas = len(elementos)
@@ -94,9 +93,9 @@ if total_elementos == 1:
     else:
         AFD(elementos, ejemplo)
 else:
-    print("este es un MTD")
+    print("\n|--- Maquina de Turing Determinista ---|")
     if VerificarMultipleDefinitios(elementos, inicio):
         print("Multiple definitions!!!")
     else:
+        print(f"Cinta Inicial: {str(ejemplo)}")
         MTD(elementos, ejemplo)
-
